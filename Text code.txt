@@ -1,0 +1,165 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+//xóa màng hình
+void xoaMH(){
+    system("clear || cls");
+}
+
+//hàm đại diện cho 1 vật phẩm gồm tên, SL, giá.
+struct SportsItem {
+    char ten[50];
+    int soluong;
+    float gia;
+};
+
+//hàm Menu
+void Menu() {
+    xoaMH();
+    printf("\n===== MENU =====\n");
+    printf("1. Hien thi tat ca vat pham\n");
+    printf("2. Them vat pham moi\n");
+    printf("3. Sap xep vat pham\n");
+    printf("4. Tim kiem vat pham\n");
+    printf("5. Ghi vao tep\n");
+    printf("6. Xoa vat pham\n");
+    printf("7. Xoa tat ca vat pham\n");
+    printf("8. Thoat\n");
+}
+
+//hàm hiện tất cả vật phẩm
+     //gọi lại cái Item,  này cho thêm biến số lượng vật phẩm
+void hienVP(struct SportsItem  item[], int SLVP){
+    int i;
+    printf("\n===== DANH SACH VAT PHAM =====\n");
+    //cho thêm biến i = 0 là số vật phẩm
+    for (int i = 0; i < SLVP; ++i){
+            //in ra các thông tin của Item dựa theo i. vd như Item 1 là áo, 2 là giầy..
+        printf("Ten: %s, So luong: %d, Gia: %.3f\n", item[i].ten, item[i].soluong, item[i].gia);
+    }
+}
+
+//hàm thêm vật phẩm. item ở đây là 1 trong các item trong SportsItem
+//VD như trong SportsItem có item áo[1], quần[2], giầy[3]....
+void themVP(struct SportsItem item[], int *SLVP){
+    printf("\nNhap thong tin vat pham moi:\n");
+    printf("Ten: ");
+    scanf("%s", item[*SLVP].ten); //do là kí tự có thể được xem như một con trỏ
+                                 // đến địa chỉ của phần tử đầu tiên trong mảng, vì vậy không cần '&' trong trường hợp này.
+    printf("So luong: ");
+    scanf("%d", &item[*SLVP].soluong);
+    printf("Gia: ");
+    scanf("%f", &item[*SLVP].gia);
+    (*SLVP++);
+}
+
+//hàm xắp xếp theo tên
+int sapxepten(const void *a, const void *b){
+    return strcmp(((struct SportsItem *)a)->ten, ((struct SportsItem *)b)->ten);
+// '*)' ở đây là để chuyển đổi con trỏ void sang con trỏ của kiểu struct SportsItem,
+//cho phép chúng ta truy cập và sử dụng dữ liệu của cấu trúc SportsItem
+}
+
+
+// Định nghĩa hàm so sánh cho việc sắp xếp vật phẩm theo số lượng
+int sapxepsoluong(const void *a, const void *b) {
+    return (((struct SportsItem *)a)->soluong, ((struct SportsItem *)b)->soluong);
+}
+
+//hàm tìm kiếm vật phẩm.
+void timkiem(struct SportsItem item[], int SLVP, char *timten){
+    int found = 0;
+    printf("\nKet qua tim kiem:\n");
+    for (int i = 0; i < SLVP; ++i){
+    // i ở đây là item 1,2,3(áo, quần, giầy)...
+    // cho nó chạy đến hết cái số lượng vật phẩm (mình có nhiêu nó chạy nhiêu
+    //2 cái thì tìm trong 2 cái item đó, 3 thfi trong 3...
+        if (strcmp(item[i].ten, timten) == 0 ){
+    // hàm 'strcmp' này là để so sánh tên có giống ko, nếu strcmp = 0 là giống.
+            printf("Ten: %s, So luong: %d, Gia: %.3f\n", item[i].ten, item[i].soluong, item[i].gia);
+            found = 1;
+    // nếu giống thì found này sẽ tăng thành 1. ý chỉ là có tìm thấy.
+        }
+    }
+    if (!found) {
+        printf("Khong tim thay vat pham\n");
+    }
+}
+
+//hàm ghi dữ liệu file
+
+
+//hàm chính
+int main(){
+    struct SportsItem item[5]; // giả sử có 5 vật phẩm
+    int SLitem = 0;
+    int chon, chonsapxep;
+    char timten[50]; //giả sử có tối đa 50 kí tự
+
+    do { //gọi hàm Menu.
+        Menu();
+        printf("\nNhap lua chon cua ban: ");
+        scanf("%d", &chon);
+
+        switch (chon){
+        case 1:
+            hienVP(item, SLitem);
+            break;
+        case 2:
+            themVP(item, &SLitem);
+            break;
+        case 3:
+            printf("Moi lua chon: \n");
+            printf("Chon 1: de sap xep theo ten.\n");
+            printf("Chon 2: de sap xep theo so luong.\n");
+            scanf("%d", &chonsapxep);
+             (chonsapxep == 1) ? qsort(item, SLitem, sizeof(struct SportsItem), sapxepten),
+                //  (sizeof(struct SportsItem)) là kích thước của mỗi phần tử trong mảng, tính bằng sizeof(struct SportsItem).
+                 printf("Vat pham da duoc sap xep theo ten.\n") :
+             (chonsapxep == 2) ? qsort(item, SLitem, sizeof(struct SportsItem), sapxepsoluong),
+                 printf("Vat pham da duoc sap xep theo so luong.\n") :
+              printf("Lua chon khong co trong danh muc.\n");
+            break;
+        case 4:
+            printf("\nNhap ten vat pham can tim: ");
+            scanf("%s", timten);
+            timkiem(item, SLitem, timten);
+            break;
+       /* case 5:
+
+            break;
+                     */
+        case 6:
+            printf("\nNhap ten vat pham can xoa: ");
+            scanf("%s", timten); //Dòng này sử dụng hàm scanf để đọc tên
+                        // của mục vật phẩm cần xóa từ bàn phím và lưu vào biến 'timten'.
+            for (int i = 0; i < SLitem; ++i){
+            if(strcmp(item[i].ten, timten) == 0){ // giống ở trên hàm strcmp so sánh có giống hay không.
+                for (int j = i; j < SLitem - 1; ++j){
+                    item[j] = item[j + 1]; // dòng for này là để đôn vị trí vật phảm lên,
+                                    // VD có 5 VP là 1,2,3,4,5, xóa 1 cái thứ 3 ik, thì còn 4VP,
+                                    // nó sẽ đôn VP số 4 lên chổ số 3, số 5 lên só 4...
+                }
+                SLitem--; // SLitem giả còn 4...
+                printf("Vat pham da duoc xoa.\n");
+                break;
+            }
+        }
+        break;
+        case 7:
+            SLitem = 0;
+            printf("Tat ca vat pham da duoc xoa\n");
+            break;
+        case 8:
+            printf("Thoat khoi chuong trinh.\n");
+            break;
+        default:
+            printf("Tuy chon khong hop le.\n");
+    }
+        printf("Nhan Enter de chon lai...");
+        while(getchar() != '\n'); // Flush stdin
+        getchar(); // Wait for Enter key
+} while (chon != 8);
+return 0;
+}
